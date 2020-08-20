@@ -43,9 +43,14 @@ function eraseCookie(name) {
 }
 
 window.onload = function(){
-    if(checkCookie(window.cookieName) != window.cookieValue){
-        createDiv();
-    }
+  if (checkCookie(window.cookieName) != window.cookieValue) {
+    createDiv();
+  }
+
+  // Open matching external feed details
+  if (window.location.href.match(/\/feeds#.*/)) {
+    u(window.location.hash).trigger("click");
+  }
 }
 
 function removeMe(){
@@ -404,4 +409,15 @@ u('#burgerMenu').on("click", function(e){
     else {
         u('#mainNav').addClass('responsive');
     }
+});
+
+// Open external feed details on click
+u("summary > a").on("click", function(e) {
+  var details = u(e.target).closest("details");
+
+  if (details.attr("open")) {
+    details.attr("open", false);
+  } else {
+    details.attr("open", true);
+  }
 });

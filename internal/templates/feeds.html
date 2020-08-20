@@ -107,7 +107,7 @@
       </hgroup>
       {{ range $Source, $Feeds := .FeedSources }}
         <details>
-          <summary>{{ $Source | prettyURL }}</summary>
+          <summary><a href="#{{ $Source | prettyURL }}">{{ $Source | prettyURL }}</a></summary>
           <hgroup>
             <footer>External feeds from <a href="{{ $Source }}">{{ $Source }}</a></h3>
           </hgroup>

@@ -13,6 +13,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/gosimple/slug"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/prologic/twtxt"
@@ -123,7 +124,7 @@ func FetchFeedSources(sources []string) *FeedSources {
 				}
 
 				mu.Lock()
-				feedsources.Sources[url] = fs
+				feedsources.Sources[slug.Make(url)] = fs
 				mu.Unlock()
 			}
 		}(url)
