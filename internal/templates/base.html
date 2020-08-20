@@ -2,11 +2,7 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="{{ .Theme }}">
   <head>
-    <link href="/css/{{ .Commit }}/pico.css" rel="stylesheet" />
-    <link href="/css/{{ .Commit }}/icss.css" rel="stylesheet" />
-    <link href="/css/{{ .Commit }}/icons.css" rel="stylesheet" />
-    <link href="/css/{{ .Commit }}/theme-switcher.css" rel="stylesheet" />
-    <link href="/css/{{ .Commit }}/twtxt.css" rel="stylesheet" />
+    <link href="/css/{{ .Commit }}/twtxt.min.css" rel="stylesheet" />
     <link rel="icon" type="image/png" href="/img/{{ .Commit}}/favicon.png" />
     
     {{ range .Alternatives }}
@@ -132,10 +128,7 @@
       </small>
     </div>
   </footer>
-  <script type="application/javascript" src="/js/{{ .Commit }}/umbrella.min.js"></script>
-  <script type="application/javascript" src="/js/{{ .Commit }}/twix.min.js"></script>
-  <script type="application/javascript" src="/js/{{ .Commit }}/theme-switcher.js"></script>
-  <script type="application/javascript" src="/js/{{ .Commit }}/twtxt.js"></script>
+  <script type="application/javascript" src="/js/{{ .Commit }}/twtxt.min.js"></script>
 </body>
 </html>
 {{end}}
