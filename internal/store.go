@@ -11,6 +11,7 @@ var (
 	ErrInvalidStore   = errors.New("error: invalid store")
 	ErrUserNotFound   = errors.New("error: user not found")
 	ErrFeedNotFound   = errors.New("error: feed not found")
+	ErrTokenNotFound  = errors.New("error: token not found")
 	ErrInvalidSession = errors.New("error: invalid session")
 )
 
@@ -31,8 +32,15 @@ type Store interface {
 	SetUser(username string, user *User) error
 	SearchUsers(prefix string) []string
 
+	DelToken(tokenValue string) error
+	HasToken(tokenValue string) bool
+	GetToken(tokenValue string) (*Token, error)
+	SetToken(tokenValue string, token *Token) error
+	SearchTokens(prefix string) []string
+
 	GetAllFeeds() ([]*Feed, error)
 	GetAllUsers() ([]*User, error)
+	GetAllTokens() ([]*Token, error)
 
 	GetSession(sid string) (*session.Session, error)
 	SetSession(sid string, sess *session.Session) error

@@ -192,6 +192,70 @@ func (bs *BitcaskStore) GetAllUsers() ([]*User, error) {
 	return users, nil
 }
 
+func (bs *BitcaskStore) DelToken(tokenValue string) error {
+	return bs.db.Delete([]byte(fmt.Sprintf("/tokens/%s", tokenValue)))
+}
+
+func (bs *BitcaskStore) HasToken(tokenValue string) bool {
+	return bs.db.Has([]byte(fmt.Sprintf("/tokens/%s", tokenValue)))
+}
+
+func (bs *BitcaskStore) GetToken(tokenValue string) (*Token, error) {
+	data, err := bs.db.Get([]byte(fmt.Sprintf("/tokens/%s", tokenValue)))
+	if err == bitcask.ErrKeyNotFound {
+		return nil, ErrTokenNotFound
+	}
+	return loadToken(data)
+}
+
+func (bs *BitcaskStore) SetToken(tokenValue string, token *Token) error {
+	data, err := token.Bytes()
+	if err != nil {
+		return err
+	}
+
+	if err := bs.db.Put([]byte(fmt.Sprintf("/tokens/%s", tokenValue)), data); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (bs *BitcaskStore) SearchTokens(prefix string) []string {
+	var keys []string
+
+	bs.db.Scan([]byte("/tokens/"), func(key []byte) error {
+		if strings.HasPrefix(strings.ToLower(string(key)), prefix) {
+			keys = append(keys, strings.TrimPrefix(string(key), "/tokens/"))
+		}
+		return nil
+	})
+
+	return keys
+}
+
+func (bs *BitcaskStore) GetAllTokens() ([]*Token, error) {
+	var tokens []*Token
+
+	err := bs.db.Scan([]byte("/tokens"), func(key []byte) error {
+		data, err := bs.db.Get(key)
+		if err != nil {
+			return err
+		}
+
+		token, err := loadToken(data)
+		if err != nil {
+			return err
+		}
+		tokens = append(tokens, token)
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return tokens, nil
+}
+
 func (bs *BitcaskStore) GetSession(sid string) (*session.Session, error) {
 	key := []byte(fmt.Sprintf("%s/%s", sessionsKeyPrefix, sid))
 	data, err := bs.db.Get(key)

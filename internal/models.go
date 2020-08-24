@@ -20,8 +20,9 @@ const (
 )
 
 var (
-	ErrFeedAlreadyExists = errors.New("error: feed already exists by that name")
-	ErrTooManyFeeds      = errors.New("error: you have too many feeds")
+	ErrFeedAlreadyExists    = errors.New("error: feed already exists by that name")
+	ErrTooManyFeeds         = errors.New("error: you have too many feeds")
+	ErrorTokenAlreadyExists = errors.New("error: token already exists by that value")
 )
 
 // Feed ...
@@ -58,6 +59,14 @@ type User struct {
 
 	remotes map[string]string
 	sources map[string]string
+}
+
+// Token ...
+type Token struct {
+	Value     string
+	UserAgent string
+	CreatedAt time.Time
+	ExpiresAt time.Time
 }
 
 func CreateFeed(conf *Config, db Store, user *User, name string, force bool) error {
@@ -205,6 +214,28 @@ func LoadUser(data []byte) (user *User, err error) {
 	return
 }
 
+// NewToken ...
+func newToken() *Token {
+	token := &Token{}
+	if err := defaults.Set(token); err != nil {
+		log.WithError(err).Error("error creating new token object")
+	}
+	return token
+}
+
+func loadToken(data []byte) (token *Token, err error) {
+	token = &Token{}
+	if err := defaults.Set(token); err != nil {
+		return nil, err
+	}
+
+	if err := json.Unmarshal(data, token); err != nil {
+		return nil, err
+	}
+
+	return token, nil
+}
+
 func (f *Feed) FollowedBy(url string) bool {
 	_, ok := f.remotes[NormalizeURL(url)]
 	return ok
@@ -245,10 +276,27 @@ func (u *User) HasToken(token string) bool {
 	return false
 }
 
+func (token *Token) Bytes() ([]byte, error) {
+	data, err := json.Marshal(token)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
 func (u *User) OwnsFeed(name string) bool {
 	name = NormalizeFeedName(name)
 	for _, feed := range u.Feeds {
 		if NormalizeFeedName(feed) == name {
+			return true
+		}
+	}
+	return false
+}
+
+func (u *User) OwnsToken(tokenValue string) bool {
+	for _, token := range u.Tokens {
+		if token == tokenValue {
 			return true
 		}
 	}
