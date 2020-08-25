@@ -1605,6 +1605,9 @@ func (s *Server) SettingsHandler() httprouter.Handle {
 		isFollowersPubliclyVisible := r.FormValue("isFollowersPubliclyVisible") == "on"
 		isFollowingPubliclyVisible := r.FormValue("isFollowingPubliclyVisible") == "on"
 
+		removedTokensString := r.FormValue("removedTokens")
+		fmt.Println(removedTokensString)
+
 		avatarFile, _, err := r.FormFile("avatar_file")
 		if err != nil && err != http.ErrMissingFile {
 			log.WithError(err).Error("error parsing form file")

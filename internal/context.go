@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"net/http"
 	"strings"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/vcraescu/go-paginator"
@@ -50,6 +51,7 @@ type Context struct {
 
 	Username      string
 	User          *User
+	Tokens        []*Token
 	LastTwt       types.Twt
 	Profile       Profile
 	Authenticated bool
@@ -75,6 +77,8 @@ type Context struct {
 
 	// Reset Password Token
 	PasswordResetToken string
+
+	Epoch time.Time
 }
 
 func NewContext(conf *Config, db Store, req *http.Request) *Context {
@@ -134,11 +138,21 @@ func NewContext(conf *Config, db Store, req *http.Request) *Context {
 		}
 		user.Following[user.Username] = user.URL
 
+		for _, tokenValue := range user.Tokens {
+			token, err := db.GetToken(tokenValue)
+			if err != nil {
+				log.WithError(err).Warnf("error loading token for %s", token)
+			}
+			ctx.Tokens = append(ctx.Tokens, token)
+		}
+
 		ctx.User = user
 	} else {
 		ctx.User = &User{}
 		ctx.Twter = types.Twter{}
 	}
+
+	ctx.Epoch = time.Time{}
 
 	// Set the theme based on user preferences
 	theme := strings.ToLower(ctx.User.Theme)

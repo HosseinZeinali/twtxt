@@ -5,6 +5,7 @@ var dropCookie = true; // false disables the Cookie, allowing you to style the b
 var cookieDuration = 14; // Number of days before the cookie expires, and the banner reappears
 var cookieName = "complianceCookie"; // Name of our cookie
 var cookieValue = "on"; // Value of cookie
+var removedTokens = []
 
 var $mentionedList = u("#mentioned-list").first(); // node list of mentioned users
 var lastSymbol = ""; // last char in textarea
@@ -630,4 +631,17 @@ function showMentionedList() {
   $mentionedList.classList.add("show");
   u("#mentioned-list").first().style.top =
     u("textarea#text").first().clientHeight + 2 + "px";
+}
+
+function deleteToken(tokenValue) {
+  var r = confirm("Are you sure you want to delete this token?")
+  if (r) {
+    if (!removedTokens.includes(tokenValue)) {
+      removedTokens.push(tokenValue)
+      removedTokens.push(Math.random())
+      u('.token-container[data-value="' + tokenValue + '"]').remove()
+
+      u("#removed-tokens").attr("value", removedTokens.join(","))
+    }
+  }
 }
